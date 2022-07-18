@@ -8,7 +8,7 @@
 
 ## Rotas: 
 <ul>
-  <li>GET '/users' retora uma lista de usuarios.</li>
+  <li>GET '/users' retorna uma lista de usuarios.</li>
   <li>POST '/users' crea um novo usuario e retorna os dados.</li>
   <li>PUT '/users/:id' atualiza um usuario.</li>
   <li>DELETE 'users/:id' exclui um usuario.</li>
