@@ -1,5 +1,5 @@
 import { Joi } from 'express-validation';
-import createMessage from './utils/index.js'
+import createMessage from './utils.js'
 
 function index(req, res, next) {
   const schema = Joi.object({

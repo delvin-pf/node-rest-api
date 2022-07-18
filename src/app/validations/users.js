@@ -1,5 +1,5 @@
 import { validate, Joi } from 'express-validation';
-import validateError from './utils/index.js'
+import createMessage from './utils.js';
 
 function login(req, res, next) {
   const schema = Joi.object({
@@ -8,8 +8,10 @@ function login(req, res, next) {
     });
 
   const { error, value } = schema.validate(req.body);
-  validateError(error, res)
- 
+  if (error) {
+    const message = createMessage(error);
+    return res.status(400).json(message);
+  }
   next();
 }
 // ##############################
@@ -21,14 +23,17 @@ function create(req, res, next) {
   });
 
   const { error, value } = schema.validate(req.body);
-  validateError(error, res);
+  if (error) {
+    const message = createMessage(error);
+    return res.status(400).json(message);
+  }
   next();
 }
 // ###############################
 function update(req, res, next) {
    const paramsSchema = Joi.object({
-    user_id: Joi.number().required()
-  })
+    id: Joi.number().required()
+  });
 
   const bodySchema = Joi.object({
     name: Joi.string(),
@@ -36,7 +41,7 @@ function update(req, res, next) {
     password: Joi.string().min(6),
     newPassword: Joi.string().min(6),
     confirmPassword: Joi.string().min(6)
-  }).when(Joi.object({
+  }).min(1).when(Joi.object({
     password: Joi.exist()
   }).unknown(), {
     then: Joi.object({
@@ -58,21 +63,30 @@ function update(req, res, next) {
   });
 
   let { error, value } = paramsSchema.validate(req.params)
-  validateError(error, res)
+  if (error) {
+    const message = createMessage(error);
+    return res.status(400).json(message);
+  }
 
   ({ error, value } = bodySchema.validate(req.body, { abortEarly: false }))
-  validateError(error, res)
-
+  if (error) {
+    const message = createMessage(error);
+    return res.status(400).json(message);
+  }
   next();
 }
+
 // ###############################
 function destroy(req, res, next) {
   const schema = Joi.object({
-    user_id: Joi.number().required()
+    id: Joi.number().required()
   });
 
   const { error, value } = schema.validate(req.params);
-  validateError(error, res)
+  if (error) {
+    const message = createMessage(error);
+    return res.status(400).json(message);
+  }
   next();
 }
 
@@ -82,4 +96,4 @@ export default {
   create,
   update,
   destroy
-}
+};

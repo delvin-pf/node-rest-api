@@ -27,7 +27,6 @@ class ProductController {
     const { id } = req.params;
 
     const product = await Products.findByPk(id, {
-      attributes: ['id', 'name', 'price'],
       include
     })
 

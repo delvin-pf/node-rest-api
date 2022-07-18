@@ -21,7 +21,7 @@ class UserController {
     })
     if (!user) {
       return res.status(422).json({
-        error: 'Error in data',
+        error: 'User no exists',
         message: 'User no exists',
         details: {
           info: 'email ${email} not found',
@@ -43,7 +43,9 @@ class UserController {
       id: user.id,
       email: user.email,
       name: user.name
-    }, secret.key)
+    }, secret.key, { 
+      expiresIn: '2h'
+    })
 
     return res.status(200).json({token: token})
   }
@@ -76,28 +78,15 @@ class UserController {
     const { id } = req.params;
     const { name, email, password, newPassword, confirmPassword } = req.body;
 
-    if (!name && !email && !password && !newPassword && !confirmPassword) {
-      return res.status(400).json({
-        error: 'ValidationError',
-        message: 'PUT method require data in body',
-        details: {
-          path: ['request´s body'],
-          value: {}
-        }
-      })
-    }
-
-    const user = await Users.findOne({
-      where: { id }
-    })
+    const user = await Users.findByPk(id);
 
     if (!user) {
       return res.status(422).json({
-        error: 'Error in data',
+        error: 'User not found',
         message: 'User no exists',
         details: {
-          info: 'email ${email} not found',
-          value: email
+          info: `user with id ${id} no exists`,
+          value: id
         }
       });
     }
@@ -124,7 +113,7 @@ class UserController {
           }
         })
       }
-      const passwordCrypted = bcrypt.hashSync(newPassword, 10)
+      const passwordCrypted = bcrypt.hashSync(newPassword, 10);
 
       try {
         await Users.update({
@@ -132,13 +121,13 @@ class UserController {
           password: passwordCrypted
         }, {
           where: { id }
-        })
-        return res.sendStatus(204)
+        });
+        return res.sendStatus(204);
       } catch (error) {
         return res.status(500).json({
           error: 'InternalServerError',
           message: 'Impossible process request'
-        })
+        });
       }
     } else {
       try {
@@ -146,13 +135,13 @@ class UserController {
           name
         }, {
           where: { id }
-        })
-        return res.sendStatus(204)
+        });
+        return res.sendStatus(204);
       } catch (error) {
         return res.status(500).json({
           error: 'InternalServerError',
           message: 'Impossible process request'
-        })
+        });
       }
     }
   }
@@ -164,8 +153,15 @@ class UserController {
         message: 'trying to change data not owned',
         details: {
           path: 'users/:id',
-          info: 'user trying delete other user'
+          info: 'trying modify not owned data'
         }
+      });
+    }
+
+    if (!(await Users.findByPk(req.auth.id))) {
+      return res.status(403).json({
+        error: 'user not found',
+        message: 'user no exists'
       })
     }
 

@@ -1,9 +1,10 @@
 import { Joi } from 'express-validation';
+import createMessage from './utils.js';
 
 function create(req, res, next) {
 
   console.log(req.body)
-  
+
   const bodySchema = Joi.object({
     name: Joi.string().required()
   })
@@ -11,14 +12,8 @@ function create(req, res, next) {
   const { error, value } = bodySchema.validate(req.body);
 
   if (error) {
-    const details = { ...error.details[0] }
-    delete details.message
-
-    return res.status(400).json({
-      error: 'ValidationError',
-      message: error.details[0].message,
-      details
-    })
+    const message = createMessage(error);
+    return res.status(400).json(message)
   }
   next()
 }
@@ -33,30 +28,21 @@ function update(req, res, next) {
 
   let { error, value } = paramsSchema.validate(req.params);
   if (error) {
-    const details = { ...error.details[0] };
-    delete details.message;
-    return res.status(400).json({
-      error: 'ValidationError',
-      message: error.details[0].message,
-      details
-    });
-  } 
+    const message = createMessage(error);
+    return res.status(400).json(message)
+  }
+  next()
 
   ({ error, value } = bodySchema.validate(req.body));
   if (error) {
-    const details = { ...error.details[0] };
-    delete details.message;
-    return res.status(400).json({
-      error: 'ValidationError',
-      message: error.details[0].message,
-      details
-    });
-  } 
-  next();
+    const message = createMessage(error);
+    return res.status(400).json(message)
+  }
+  next()
 }
 
 
-export default { 
+export default {
   create,
   update
 }

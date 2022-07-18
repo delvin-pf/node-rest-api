@@ -20,6 +20,9 @@ class App {
 
   handleError() {
     this.server.use(handleRoutesError)
+    this.server.use( (error, req, res) => {
+      console.log(typeof error)
+    })
   }
 
 }
