@@ -3,7 +3,8 @@ import 'dotenv/config';
 
 const secret = JSON.parse(process.env.SECRET);
 
-export default function auth(req, res, next) {
+function auth(req, res, next) {
+  console.log('auth')
   const [_, token] = req.headers.authorization.split(' ')
 
   if (!token) {
@@ -23,4 +24,7 @@ export default function auth(req, res, next) {
     }
     next();
 });
+
 }
+
+export default auth;

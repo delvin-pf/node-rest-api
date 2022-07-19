@@ -1,4 +1,5 @@
 import { Products, Manufacturers, Categories } from '../models/index.js';
+import mcache from 'memory-cache';
 
 const include = [ {
   model: Manufacturers,
@@ -16,16 +17,17 @@ const include = [ {
 class ProductController {
 
   async store(req, res) {
-    const products = await Products.findAll({
-      attributes: ['id', 'name', 'price'],
-      include,
-    })
-    return res.status(200).json(products);
+      const products = await Products.findAll({
+        attributes: ['id', 'name', 'price'],
+        include,
+      })
+      const time = new Date().toTimeString()
+      products.push({time: time})
+      return res.status(200).json(products);
   }
 
   async index(req, res) {
     const { id } = req.params;
-
     const product = await Products.findByPk(id, {
       include
     })
@@ -38,7 +40,6 @@ class ProductController {
     }
 
     return res.status(200).json(product)
-
   }
 
   async create(req, res) {

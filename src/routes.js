@@ -11,23 +11,25 @@ import categoryValidation from './app/validations/categories.js'; // Categories
 
 // Middelwares
 import auth from './app/middelwares/authenticate.js';
+// Cache
+import cache from './app/middelwares/cache.js';
 
 const routes = new Router();
 
-routes.get('/users', auth, UserController.store);
+routes.get('/users', auth, cache(15), UserController.store);
 routes.post('/login', userValidation.login, UserController.login);
 routes.post('/users', userValidation.create, UserController.create);
 routes.put('/users/:id', auth, userValidation.update, UserController.update);
 routes.delete('/users/:id', auth, userValidation.destroy, UserController.delete);
 
-routes.get('/categories', CategoryController.store);
+routes.get('/categories', cache(60), CategoryController.store);
 routes.post('/categories', auth, categoryValidation.create, CategoryController.create);
 routes.put('/categories/:id', auth, categoryValidation.update, CategoryController.update);
 
-routes.get('/products', ProductController.store);
+routes.get('/products', cache(15), ProductController.store);
 routes.get('/products/:id', productValidation.index, ProductController.index);
 routes.post('/products', auth, productValidation.create, ProductController.create);
-routes.put('/products/:id',auth, productValidation.update, ProductController.update);
+routes.put('/products/:id', auth, productValidation.update, ProductController.update);
 routes.delete('/products/:id', auth, productValidation.destroy, ProductController.delete)
 
 
